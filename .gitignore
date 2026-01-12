@@ -14,8 +14,3 @@ Thumbs.db
 
 # User Requested Ignores
 *.md
-!build_instructions.md
-!walkthrough.md
-!task.md
-!implementation_plan.md
-!working.md
