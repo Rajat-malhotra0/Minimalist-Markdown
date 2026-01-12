@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <title>Untitled - Minimalist Markdown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Highlight.js theme (Local) -->
+    <link rel="stylesheet" href="libs/atom-one-dark.min.css">
+</head>
+<body>
+    <div class="title-bar">
+        <span id="file-status" class="file-status">Untitled</span>
+        <span id="save-status" class="save-indicator">Saved</span>
+    </div>
+    
+    <div class="container">
+        <div class="pane editor-pane">
+            <textarea id="editor" placeholder="Start typing markdown..." spellcheck="false"></textarea>
+        </div>
+        
+        <div class="resizer" id="resizer"></div>
+        
+        <div class="pane preview-pane" id="preview">
+            <!-- Markdown content will be rendered here -->
+            <div class="empty-state">Preview</div>
+        </div>
+    </div>
+    
+    <!-- About/Copyright Modal -->
+    <div id="about-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-logo">M</div>
+            <h2>Minimalist Markdown</h2>
+            <p>Version 1.0.0</p>
+            <div class="copyright-text">
+                &copy; <span id="year"></span> Rajat Malhotra.<br>
+                All Rights Reserved.
+            </div>
+            <button id="close-about">Close</button>
+        </div>
+    </div>
+    
+    <!-- Libraries (Local) -->
+    <script src="libs/marked.min.js"></script>
+    <script src="libs/highlight.min.js"></script>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

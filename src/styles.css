@@ -1,0 +1,465 @@
+:root {
+    --bg-color: #0f0f12; /* Deep, rich black-blue */
+    --pane-bg: #131316;
+    --text-color: #e4e4e7;
+    --text-muted: #a1a1aa;
+    --accent-color: #818cf8; /* Indigo-400 */
+    --accent-glow: rgba(129, 140, 248, 0.15);
+    --border-color: #27272a;
+    --scrollbar-bg: #18181b;
+    --scrollbar-thumb: #3f3f46;
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --selection-color: rgba(129, 140, 248, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-ui);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Title Bar */
+.title-bar {
+    height: 42px;
+    background: rgba(15, 15, 18, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* This centers flex items, but absolute is safer for exact center */
+    border-bottom: 1px solid var(--border-color);
+    -webkit-app-region: drag;
+    font-size: 13px;
+    color: var(--text-muted);
+    user-select: none;
+    transition: color 0.3s ease;
+    position: relative; /* Needed for absolute child */
+}
+
+/* ... */
+
+.file-status {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: text; /* Indicate editable */
+    z-index: 10;
+    -webkit-app-region: no-drag; /* Allow clicking/double-clicking */
+}
+
+.file-status input {
+    background: #1a1a1e;
+    color: var(--text-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    outline: none;
+    text-align: center;
+    width: 200px;
+}
+
+.save-indicator {
+    display: none; /* User requested removal */
+}
+
+/* Layout */
+.container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 42px);
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Preview Only Mode */
+.container.preview-only .editor-pane,
+.container.preview-only .resizer {
+    display: none;
+}
+
+.container.preview-only .preview-pane {
+    max-width: 900px; /* Readable width */
+    margin: 0 auto;
+    width: 100%;
+}
+
+.save-indicator.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.save-indicator.unsaved {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+/* Layout */
+.container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 42px);
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* Pane Layout */
+.pane {
+    min-width: 0;
+    overflow-y: overlay;
+    height: 100%;
+    scrollbar-gutter: stable;
+}
+
+.editor-pane {
+    flex: 0 0 50%; /* Start at 50%, controlled by JS */
+    border-right: 1px solid var(--border-color);
+}
+
+.preview-pane {
+    flex: 1; /* Always fill remaining space */
+    padding: 40px 60px;
+    line-height: 1.7;
+    word-wrap: break-word;
+}
+
+/* Scrollbar Gutter Fixes */
+.pane, textarea {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* --- About Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: #1e1e24;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    max-width: 300px;
+}
+
+.modal-logo {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+.modal-content h2 {
+    font-size: 18px;
+    margin: 0 0 5px 0;
+    font-weight: 600;
+}
+
+.modal-content p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0 0 20px 0;
+}
+
+.copyright-text {
+    color: var(--text-color);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+#close-about {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+#close-about:hover {
+    background: var(--accent-hover);
+}
+
+/* Editor Styling */
+.editor-pane {
+    background-color: var(--pane-bg);
+    overflow-y: hidden; /* Prevent double scrollbars; let textarea scroll */
+}
+
+textarea {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    background-color: transparent;
+    border: none;
+    resize: none;
+    color: #e4e4e7; /* Brighter initial text */
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.8; /* Increased breathing room */
+    padding: 40px;
+    outline: none;
+    /* Removed text-shadow transition which caused snapiness */
+    transition: opacity 0.2s ease;
+    caret-color: var(--accent-color); 
+    opacity: 0.9;
+}
+
+textarea:focus {
+    opacity: 1; /* Subtle focus state */
+    outline: none;
+}
+
+/* Typography Aesthetics - Clean & Stable */
+/* Removed .is-typing jitter effects */
+
+::selection {
+    background: rgba(129, 140, 248, 0.3);
+    color: #fff;
+}
+
+/* Editor Container Glow - Constant but subtle */
+.editor-pane {
+    transition: background-color 0.3s ease;
+}
+
+.editor-pane:focus-within {
+    background-color: #1a1a1e; /* Extremely subtle lighten on focus */
+}
+/* ... */
+::-webkit-scrollbar-thumb:hover {
+    background: #71717a;
+    border: 2px solid transparent;
+    -webkit-background-clip: content-box;
+    background-clip: content-box;
+}
+
+/* Ensure editor pane content transitions smoothly */
+.editor-pane {
+    transition: background-color 0.3s ease;
+}
+
+/* Focus indication on Pane instead */
+.editor-pane {
+    transition: box-shadow 0.3s ease;
+}
+
+body.is-typing .editor-pane {
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+/* ... */
+::-webkit-scrollbar-thumb:hover {
+    background: #71717a;
+    border: 2px solid transparent;
+    -webkit-background-clip: content-box;
+    background-clip: content-box;
+}
+
+/* Ensure editor pane content transitions smoothly */
+.editor-pane {
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Preview Styling */
+.preview-pane {
+    background-color: var(--bg-color);
+    padding: 40px 50px;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+/* Resizer */
+.resizer {
+    width: 1px;
+    background: var(--border-color);
+    cursor: col-resize;
+    position: relative;
+    z-index: 20;
+    transition: background 0.3s, width 0.3s;
+    flex-shrink: 0;
+}
+
+.resizer:after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    right: -4px;
+    top: 0;
+    bottom: 0;
+    z-index: 10; /* Wider hit area */
+}
+
+.resizer:hover, .resizer.active {
+    background: var(--accent-color);
+    /* box-shadow: 0 0 10px var(--accent-color); Removed neon glow */
+}
+
+/* Custom Scrollbar - Minimal & Floating-like */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #71717a;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+/* Typography & Elements in Preview */
+.preview-pane h1, .preview-pane h2, .preview-pane h3, .preview-pane h4 {
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+    letter-spacing: -0.02em;
+}
+
+.preview-pane h1 { 
+    font-size: 2.5em; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 0.3em;
+    background: linear-gradient(to right, #fff, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.preview-pane h2 { font-size: 1.8em; }
+.preview-pane p { margin-bottom: 1.5em; color: #d4d4d8; }
+
+.preview-pane a { 
+    color: var(--accent-color); 
+    text-decoration: none; 
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+.preview-pane a:hover { border-bottom-color: var(--accent-color); }
+
+.preview-pane code {
+    font-family: var(--font-mono);
+    background-color: rgba(255,255,255,0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: #e4e4e7;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.preview-pane pre {
+    background-color: #18191d;
+    padding: 1.5em;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 2em;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.preview-pane pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.9em;
+    color: inherit;
+    border: none;
+}
+
+.preview-pane blockquote {
+    border-left: 3px solid var(--accent-color);
+    background: linear-gradient(to right, rgba(129, 140, 248, 0.05), transparent);
+    padding: 1em 1em 1em 1.5em;
+    color: #a1a1aa;
+    margin-bottom: 1.5em;
+    border-radius: 0 8px 8px 0;
+}
+
+.preview-pane img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1em 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.preview-pane hr {
+    border: none;
+    height: 1px;
+    background: var(--border-color);
+    margin: 3em 0;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    color: #52525b;
+    font-size: 0.9em;
+    animation: pulse 4s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+}
